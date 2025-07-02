@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Manas!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f9d423 0%, #ff4e50 100%);
+            color: #222;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .container {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            margin-top: 40px;
+            padding: 32px 24px 24px 24px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        .photo-crop {
+            width: 100%;
+            max-width: 100%;
+            height: 320px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        .photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 20%;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            margin-bottom: 0;
+        }
+        h1 {
+            font-size: 2.2rem;
+            margin: 0 0 10px 0;
+            color: #ff4e50;
+        }
+        .countdown {
+            font-size: 1.3rem;
+            margin: 18px 0 24px 0;
+            color: #333;
+        }
+        .message {
+            font-size: 1.1rem;
+            margin-bottom: 24px;
+        }
+        .game-section {
+            margin-top: 24px;
+        }
+        .confetti {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 999;
+        }
+        .balloon-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 998;
+            overflow: hidden;
+        }
+        .balloon {
+            position: absolute;
+            bottom: -120px;
+            width: 60px;
+            height: 80px;
+            background: radial-gradient(circle at 60% 40%, #fff 10%, var(--color) 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+            animation: floatBalloon 8s linear infinite;
+        }
+        .balloon:after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -30px;
+            width: 2px;
+            height: 30px;
+            background: #aaa;
+            transform: translateX(-50%);
+        }
+        @keyframes floatBalloon {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(-110vh) scale(1.05); opacity: 0; }
+        }
+        @media (max-width: 500px) {
+            .container {
+                padding: 16px 4px 16px 4px;
+                margin-top: 16px;
+                max-width: 98vw;
+            }
+            .photo-crop {
+                height: 180px;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+            .countdown, .message {
+                font-size: 1rem;
+            }
+            .game-section h2 {
+                font-size: 1.1rem;
+            }
+            button, .game-section button {
+                font-size: 1rem !important;
+                padding: 8px 12px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="photo-crop">
+            <img src="WhatsApp Image 2025-07-02 at 17.18.20_8cc0655c.jpg" alt="Manas's Photo" class="photo">
+        </div>
+        <h1>Happy Birthday, Manas!</h1>
+        <div class="countdown" id="countdown"></div>
+        <div class="message">
+            Wishing you an amazing birthday, Manas!<br>
+            May your year be filled with creativity, joy, and awesome video edits!<br>
+            <b>From your friend :)</b>
+        </div>
+        <div class="game-section">
+            <h2>🎬 Edit the Clips! (Mini Game)</h2>
+            <div id="game"></div>
+        </div>
+    </div>
+    <div class="balloon-bg" id="balloon-bg" style="display:none;"></div>
+    <canvas class="confetti" id="confetti-canvas"></canvas>
+    <audio id="birthday-audio" src="Birthday Song.mp3" preload="auto"></audio>
+    <script>
+    // Countdown Timer
+    const countdownEl = document.getElementById('countdown');
+    // 2025-07-14 00:01:00 IST is 2025-07-13 18:31:00 UTC
+    const birthday = new Date(Date.now() + 10000); // 10 seconds from now
+    let musicStarted = false;
+    let celebrationStarted = false;
+    let celebrationBtn = null;
+    function updateCountdown() {
+        const now = new Date();
+        const diff = birthday - now;
+        const secondsLeft = Math.ceil(diff / 1000);
+        if (secondsLeft === 3 && !musicStarted && !celebrationStarted) {
+            showStartCelebrationButton();
+            return;
+        }
+        if (diff <= 0) {
+            if (!window._birthdayCelebrated) {
+                window._birthdayCelebrated = true;
+                showBirthdayMessageAndCelebrate();
+            }
+            return;
+        }
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diff / (1000 * 60)) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+        countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s until Manas's Birthday!`;
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    function showBirthdayMessageAndCelebrate() {
+        countdownEl.style.fontSize = '';
+        countdownEl.style.color = '';
+        countdownEl.innerHTML = "<b>It's Manas's Birthday! 🎉</b>";
+        launchConfetti();
+        launchBalloons();
+        playBirthdayMusic();
+    }
+
+    // Also play music if page loads after birthday
+    window.addEventListener('DOMContentLoaded', function() {
+        const now = new Date();
+        if (birthday - now <= 0) {
+            countdownEl.innerHTML = "<b>It's Manas's Birthday! 🎉</b>";
+            launchConfetti();
+            launchBalloons();
+            window._birthdayCelebrated = true;
+            playBirthdayMusic();
+        }
+    });
+
+    function playBirthdayMusic() {
+        const audio = document.getElementById('birthday-audio');
+        audio.currentTime = 9;
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {
+                // Autoplay was prevented; user must interact with the page to start music
+                document.body.addEventListener('click', function handler() {
+                    audio.currentTime = 9;
+                    audio.play();
+                    document.body.removeEventListener('click', handler);
+                });
+            });
+        }
+    }
+
+    // Confetti Animation (simple)
+    function launchConfetti() {
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let confetti = [];
+        for (let i = 0; i < 150; i++) {
+            confetti.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                r: Math.random() * 6 + 4,
+                d: Math.random() * 50 + 50,
+                color: `hsl(${Math.random()*360}, 80%, 60%)`,
+                tilt: Math.random() * 10 - 10
+            });
+        }
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            confetti.forEach(c => {
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, c.r, 0, 2 * Math.PI);
+                ctx.fillStyle = c.color;
+                ctx.fill();
+            });
+            update();
+        }
+        function update() {
+            confetti.forEach(c => {
+                c.y += Math.cos(c.d) + 2 + c.r/2;
+                c.x += Math.sin(c.d);
+                if (c.y > canvas.height) {
+                    c.y = -10;
+                    c.x = Math.random() * canvas.width;
+                }
+            });
+        }
+        setInterval(draw, 20);
+    }
+
+    // Mini Game: Edit the Clips!
+    // Simple clicker: "Edit" as many clips as you can in 20 seconds
+    const gameDiv = document.getElementById('game');
+    let score = 0;
+    let timeLeft = 20;
+    let gameActive = false;
+    function startGame() {
+        score = 0;
+        timeLeft = 20;
+        gameActive = true;
+        gameDiv.innerHTML = `
+            <div><b>Click the 🎬 button to "edit" clips!</b></div>
+            <button id="edit-btn" style="font-size:2rem;margin:16px 0;padding:12px 32px;border-radius:12px;background:#ff4e50;color:#fff;border:none;cursor:pointer;">🎬 Edit Clip</button>
+            <div>Score: <span id="score">0</span></div>
+            <div>Time Left: <span id="timer">20</span>s</div>
+        `;
+        document.getElementById('edit-btn').onclick = () => {
+            if (gameActive) {
+                score++;
+                document.getElementById('score').textContent = score;
+            }
+        };
+        const timer = setInterval(() => {
+            if (!gameActive) return clearInterval(timer);
+            timeLeft--;
+            document.getElementById('timer').textContent = timeLeft;
+            if (timeLeft <= 0) {
+                gameActive = false;
+                gameDiv.innerHTML = `<div style='font-size:1.3rem;'>Time's up!<br>Your final score: <b>${score}</b><br><button onclick='startGame()' style='margin-top:12px;padding:8px 20px;border-radius:8px;background:#f9d423;color:#222;border:none;cursor:pointer;'>Play Again</button></div>`;
+            }
+        }, 1000);
+    }
+    // Show start button
+    gameDiv.innerHTML = `<button onclick="startGame()" style="font-size:1.1rem;padding:10px 28px;border-radius:10px;background:#f9d423;color:#222;border:none;cursor:pointer;">Start Game</button>`;
+
+    function launchBalloons() {
+        const balloonBg = document.getElementById('balloon-bg');
+        balloonBg.style.display = 'block';
+        balloonBg.innerHTML = '';
+        const colors = ['#ff4e50', '#f9d423', '#4ecdc4', '#556270', '#c7f464', '#ff6f69'];
+        for (let i = 0; i < 12; i++) {
+            const balloon = document.createElement('div');
+            balloon.className = 'balloon';
+            balloon.style.setProperty('--color', colors[Math.floor(Math.random()*colors.length)]);
+            balloon.style.left = Math.random() * 95 + 'vw';
+            balloon.style.animationDelay = (Math.random() * 6) + 's';
+            balloonBg.appendChild(balloon);
+        }
+    }
+
+    function showStartCelebrationButton() {
+        celebrationBtn = document.createElement('button');
+        celebrationBtn.textContent = 'Start Celebration!';
+        celebrationBtn.style = 'display:block;margin:24px auto 0 auto;padding:16px 32px;font-size:1.3rem;border-radius:12px;background:#ff4e50;color:#fff;border:none;cursor:pointer;';
+        countdownEl.innerHTML = '';
+        countdownEl.appendChild(celebrationBtn);
+        celebrationBtn.onclick = function() {
+            musicStarted = true;
+            celebrationStarted = true;
+            playBirthdayMusic();
+            showBirthdayMessageAndCelebrate();
+        };
+    }
+    </script>
+</body>
+</html> 

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div id="score">Score: 0 | High: 0 | Lives: 3</div>
     <svg id="game" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" overflow="visible">
       <linearGradient id="ArcGradient" >
           <stop offset="0"  stop-color="#fff" stop-opacity=".2"/>
@@ -60,14 +61,68 @@
         <path d="M486 113L484 130 506 130 481 188 506 187 520 131 540 135 545 119"/>
         <path d="M526,195l5-20l22,5l-9,16L526,195z M558,164l32-44l-35-9l-19,51L558,164z"/>
       </g>
-    <!-- 	<line x1= "875", y1= "280", x2= "925", y2= "220" stroke="red"/>
+   <line x1= "875", y1= "280", x2= "925", y2= "220" stroke="red"
 
-    <circle class="point" r="7" fill="purple" opacity=".4"/> -->
+    <circle class="point" r="7" fill="purple" opacity=".4"/> 
     </svg>
 
     <span>Draw back an arrow and launch it!</span>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/TweenMax.min.js'></script>
 <script src='//s3-us-west-2.amazonaws.com/s.cdpn.io/16327/MorphSVGPlugin.min.js'></script>
     <script src="script.js"></script>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #232526 0%, #414345 100%);
+        overflow: hidden;
+        font-family: 'Montserrat', Arial, sans-serif;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+      }
+      canvas {
+        display: block;
+        background: #2c3e50;
+      }
+      #score {
+        position: absolute;
+        top: 18px;
+        left: 18px;
+        font-size: 1.3rem;
+        background: rgba(30,30,40,0.85);
+        padding: 14px 28px;
+        border-radius: 14px;
+        color: #fff;
+        z-index: 10;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+        letter-spacing: 1px;
+        font-family: 'Montserrat', Arial, sans-serif;
+        font-weight: 700;
+        border: 2px solid #4ecdc4;
+        pointer-events: none;
+        transition: box-shadow 0.2s;
+      }
+      #score::after {
+        content: '🏹';
+        margin-left: 12px;
+        font-size: 1.2em;
+        vertical-align: middle;
+        opacity: 0.7;
+      }
+      #game {
+        display: block;
+        background: transparent;
+        margin-top: 60px;
+        filter: drop-shadow(0 0 24px #4ecdc4aa);
+        border-radius: 18px;
+        transition: filter 0.2s;
+      }
+      #game:hover {
+        filter: drop-shadow(0 0 40px #f9d423cc);
+      }
+    </style>
   </body>
 </html>

@@ -3,6 +3,13 @@ var cursor = svg.createSVGPoint();
 var arrows = document.querySelector(".arrows");
 var randomAngle = 0;
 
+// Score, high score, and lives
+var score = 0;
+var highScore = 0;
+var lives = 3;
+var scoreDiv = document.getElementById("score");
+updateScoreDisplay();
+
 // center of target
 var target = {
 	x: 900,
@@ -155,16 +162,36 @@ function hitTest(tween) {
 		var dy = intersection.y - target.y;
 		var distance = Math.sqrt((dx * dx) + (dy * dy));
 		var selector = ".hit";
+		var points = 0;
 		if (distance < 7) {
-			selector = ".bullseye"
+			selector = ".bullseye";
+			points = 50;
+		} else if (distance < 20) {
+			points = 25;
+		} else if (distance < 40) {
+			points = 10;
+		} else {
+			points = 5;
 		}
+		score += points;
+		if (score > highScore) highScore = score;
+		updateScoreDisplay();
 		showMessage(selector);
+		// Reset lives on hit
+		lives = 3;
+		updateScoreDisplay();
 	}
-
 }
 
 function onMiss() {
-	// Damn!
+	// Missed the target
+	lives--;
+	if (lives === 0) {
+		if (score > highScore) highScore = score;
+		score = 0;
+		lives = 3;
+	}
+	updateScoreDisplay();
 	showMessage(".miss");
 }
 
@@ -220,4 +247,8 @@ function getIntersection(segment1, segment2) {
 		segment1: ua >= 0 && ua <= 1,
 		segment2: ub >= 0 && ub <= 1
 	};
+}
+
+function updateScoreDisplay() {
+	scoreDiv.textContent = `Score: ${score} | High: ${highScore} | Lives: ${lives}`;
 }

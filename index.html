@@ -125,13 +125,43 @@
                 padding: 8px 12px !important;
             }
         }
+        .archery-target {
+            display: none;
+            margin: 0 auto 16px auto;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle at 50% 50%, #fff 30px, #f00 60px, #fff 90px, #00f 120px, #fff 150px, #222 220px);
+            border-radius: 50%;
+            position: relative;
+        }
+        .arrow {
+            position: absolute;
+            left: 50%;
+            width: 6px;
+            height: 60px;
+            background: #964B00;
+            border-radius: 3px;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+        .arrow-head {
+            width: 0; height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 18px solid #333;
+            position: absolute;
+            left: 50%;
+            top: -18px;
+            transform: translateX(-50%);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="photo-crop">
+        <div class="photo-crop" id="photo-crop">
             <img src="WhatsApp Image 2025-07-02 at 17.18.20_8cc0655c.jpg" alt="Manas's Photo" class="photo">
         </div>
+        <div class="archery-target" id="archery-target"></div>
         <h1>Happy Birthday, Manas!</h1>
         <div class="countdown" id="countdown"></div>
         <div class="message">
@@ -139,9 +169,11 @@
             May your year be filled with creativity, joy, and awesome video edits!<br>
             <b>From your friend :)</b>
         </div>
-        <div class="game-section">
-            <h2>🎬 Edit the Clips! (Mini Game)</h2>
-            <div id="game"></div>
+        <div class="game-section" id="game-section">
+            <div class="archery-target" id="archery-target" style="position:relative; margin: 0 auto 16px auto; width: 300px; height: 300px; overflow: visible;"></div>
+        </div>
+        <div id="play-game-link" style="margin-top: 24px; display: none;">
+            <a href="game.html" target="_blank" style="display:inline-block;padding:12px 28px;font-size:1.1rem;border-radius:10px;background:#4ecdc4;color:#222;text-decoration:none;font-weight:bold;">🕹️ Play game till birthday comes</a>
         </div>
     </div>
     <div class="balloon-bg" id="balloon-bg" style="display:none;"></div>
@@ -181,6 +213,7 @@
     }
 
     function showBirthdayMessageAndCelebrate() {
+        document.getElementById('game-section').style.display = 'none';
         countdownEl.style.fontSize = '';
         countdownEl.style.color = '';
         countdownEl.innerHTML = "<b>It's Manas's Birthday! 🎉</b>";
@@ -257,73 +290,52 @@
         setInterval(draw, 20);
     }
 
-    // Mini Game: Edit the Clips!
-    // Simple clicker: "Edit" as many clips as you can in 20 seconds
-    const gameDiv = document.getElementById('game');
-    let score = 0;
-    let timeLeft = 20;
-    let gameActive = false;
-    function startGame() {
-        score = 0;
-        timeLeft = 20;
-        gameActive = true;
-        gameDiv.innerHTML = `
-            <div><b>Click the 🎬 button to "edit" clips!</b></div>
-            <button id="edit-btn" style="font-size:2rem;margin:16px 0;padding:12px 32px;border-radius:12px;background:#ff4e50;color:#fff;border:none;cursor:pointer;">🎬 Edit Clip</button>
-            <div>Score: <span id="score">0</span></div>
-            <div>Time Left: <span id="timer">20</span>s</div>
-        `;
-        document.getElementById('edit-btn').onclick = () => {
-            if (gameActive) {
-                score++;
-                document.getElementById('score').textContent = score;
-            }
-        };
-        const timer = setInterval(() => {
-            if (!gameActive) return clearInterval(timer);
-            timeLeft--;
-            document.getElementById('timer').textContent = timeLeft;
-            if (timeLeft <= 0) {
-                gameActive = false;
-                gameDiv.innerHTML = `<div style='font-size:1.3rem;'>Time's up!<br>Your final score: <b>${score}</b><br><button onclick='startGame()' style='margin-top:12px;padding:8px 20px;border-radius:8px;background:#f9d423;color:#222;border:none;cursor:pointer;'>Play Again</button></div>`;
-            }
-        }, 1000);
-    }
-    // Show start button
-    gameDiv.innerHTML = `<button onclick="startGame()" style="font-size:1.1rem;padding:10px 28px;border-radius:10px;background:#f9d423;color:#222;border:none;cursor:pointer;">Start Game</button>`;
+    // Archery game logic with image target (no controls or score)
+    const archeryTarget = document.getElementById('archery-target');
+    let targetInterval = null;
+    let targetX = 150; // center for 300px
+    let targetSpeed = 2; // px per frame
+    let targetDirection = 1;
+    let targetImg = null;
 
-    function launchBalloons() {
-        const balloonBg = document.getElementById('balloon-bg');
-        balloonBg.style.display = 'block';
-        balloonBg.innerHTML = '';
-        const colors = ['#ff4e50', '#f9d423', '#4ecdc4', '#556270', '#c7f464', '#ff6f69'];
-        for (let i = 0; i < 12; i++) {
-            const balloon = document.createElement('div');
-            balloon.className = 'balloon';
-            balloon.style.setProperty('--color', colors[Math.floor(Math.random()*colors.length)]);
-            balloon.style.left = Math.random() * 95 + 'vw';
-            balloon.style.animationDelay = (Math.random() * 6) + 's';
-            balloonBg.appendChild(balloon);
-        }
+    function drawTargetBoard() {
+        archeryTarget.innerHTML = '';
+        // Add the image as the target
+        targetImg = document.createElement('img');
+        targetImg.src = 'archeary.png';
+        targetImg.style.position = 'absolute';
+        targetImg.style.left = `${targetX - 150}px`;
+        targetImg.style.top = '0px';
+        targetImg.style.width = '300px';
+        targetImg.style.height = '300px';
+        targetImg.style.zIndex = 1;
+        archeryTarget.appendChild(targetImg);
     }
 
-    function showStartCelebrationButton() {
-        if (countdownInterval) {
-            clearInterval(countdownInterval);
-            countdownInterval = null;
-        }
-        celebrationBtn = document.createElement('button');
-        celebrationBtn.textContent = 'Start Celebration!';
-        celebrationBtn.style = 'display:block;margin:24px auto 0 auto;padding:16px 32px;font-size:1.3rem;border-radius:12px;background:#ff4e50;color:#fff;border:none;cursor:pointer;';
-        countdownEl.innerHTML = '';
-        countdownEl.appendChild(celebrationBtn);
-        celebrationBtn.onclick = function() {
-            musicStarted = true;
-            celebrationStarted = true;
-            playBirthdayMusic();
-            showBirthdayMessageAndCelebrate();
-        };
+    function startArcheryGame() {
+        targetX = 150;
+        targetDirection = 1;
+        drawTargetBoard();
+        moveTarget();
     }
+
+    function moveTarget() {
+        if (targetInterval) clearInterval(targetInterval);
+        targetInterval = setInterval(() => {
+            targetX += targetSpeed * targetDirection;
+            if (targetX > 250 || targetX < 50) targetDirection *= -1;
+            drawTargetBoard();
+        }, 16);
+    }
+
+    // Only show play game link before birthday
+    window.addEventListener('DOMContentLoaded', function() {
+        const now = new Date();
+        if (birthday - now > 0) {
+            startArcheryGame();
+            document.getElementById('play-game-link').style.display = 'block';
+        }
+    });
     </script>
 </body>
 </html> 

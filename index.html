@@ -151,10 +151,13 @@
     // Countdown Timer
     const countdownEl = document.getElementById('countdown');
     // 2025-07-14 00:01:00 IST is 2025-07-13 18:31:00 UTC
-    const birthday = new Date(Date.now() + 10000); // 10 seconds from now
+    const birthday = new Date(Date.UTC(2025, 6, 13, 18, 31, 0));
     let musicStarted = false;
     let celebrationStarted = false;
     let celebrationBtn = null;
+    let countdownInterval = setInterval(updateCountdown, 1000);
+    updateCountdown();
+
     function updateCountdown() {
         const now = new Date();
         const diff = birthday - now;
@@ -176,8 +179,6 @@
         const seconds = Math.floor((diff / 1000) % 60);
         countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s until Manas's Birthday!`;
     }
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
 
     function showBirthdayMessageAndCelebrate() {
         countdownEl.style.fontSize = '';
@@ -307,6 +308,10 @@
     }
 
     function showStartCelebrationButton() {
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
         celebrationBtn = document.createElement('button');
         celebrationBtn.textContent = 'Start Celebration!';
         celebrationBtn.style = 'display:block;margin:24px auto 0 auto;padding:16px 32px;font-size:1.3rem;border-radius:12px;background:#ff4e50;color:#fff;border:none;cursor:pointer;';

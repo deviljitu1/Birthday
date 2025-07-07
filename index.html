@@ -177,7 +177,6 @@
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
-        
         .balloon {
             position: absolute;
             width: 40px;
@@ -185,25 +184,46 @@
             background-color: rgba(255, 0, 0, 0.7);
             border-radius: 50%;
             z-index: 1;
-            animation: float 15s linear infinite;
+            animation: float 8s ease-in infinite;
+            bottom: -50px;
         }
         
         .balloon::before {
             content: '';
             position: absolute;
-            width: 2px;
-            height: 50px;
-            background-color: #333;
-            bottom: -50px;
+            width: 1px;
+            height: 60px;
+            background-color: rgba(0,0,0,0.2);
+            bottom: -60px;
             left: 50%;
             transform: translateX(-50%);
         }
         
-        @keyframes float {
-            0% { transform: translateY(100vh) rotate(0deg); }
-            100% { transform: translateY(-100px) rotate(360deg); }
+        .balloon::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 8px;
+            background-color: rgba(0,0,0,0.2);
+            bottom: -68px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 50%;
         }
         
+        @keyframes float {
+            0% {
+                transform: translateX(0) translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: translateX(50px) translateY(-100px) rotate(10deg);
+            }
+            100% {
+                transform: translateX(100px) translateY(-100vh) rotate(20deg);
+                opacity: 0;
+            }
+        }
         .confetti {
             position: fixed;
             top: 0;
@@ -313,19 +333,51 @@
     <audio id="birthday-audio" src="Birthday Song.mp3" preload="auto"></audio>
     
     <script>
-        // Create balloons
+       // Create balloons - updated version
         function createBalloons() {
-            const colors = ['#ff6b6b', '#4ecdc4', '#ffbe76', '#576574', '#f368e0'];
-            for (let i = 0; i < 15; i++) {
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffbe76', '#576574', '#f368e0', '#ff9ff3', '#feca57', '#ff9f43'];
+            
+            for (let i = 0; i < 20; i++) {
                 const balloon = document.createElement('div');
                 balloon.className = 'balloon';
+                
+                // Random positioning
                 balloon.style.left = Math.random() * 100 + 'vw';
+                
+                // Random properties
                 balloon.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                balloon.style.animationDuration = 10 + Math.random() * 20 + 's';
-                balloon.style.animationDelay = Math.random() * 5 + 's';
+                balloon.style.width = (30 + Math.random() * 30) + 'px';
+                balloon.style.height = (40 + Math.random() * 40) + 'px';
                 balloon.style.opacity = 0.7 + Math.random() * 0.3;
-                balloon.style.width = 30 + Math.random() * 30 + 'px';
-                balloon.style.height = 40 + Math.random() * 40 + 'px';
+                
+                // Random animation
+                const duration = 6 + Math.random() * 12;
+                balloon.style.animation = `float ${duration}s ease-in infinite`;
+                balloon.style.animationDelay = Math.random() * 5 + 's';
+                
+                // Random horizontal movement
+                const keyframes = `
+                    @keyframes float-${i} {
+                        0% {
+                            transform: translateX(${Math.random() * 20 - 10}px) translateY(0) rotate(0deg);
+                            opacity: 1;
+                        }
+                        50% {
+                            transform: translateX(${Math.random() * 100 - 50}px) translateY(-50vh) rotate(${Math.random() * 30 - 15}deg);
+                        }
+                        100% {
+                            transform: translateX(${Math.random() * 100 - 50}px) translateY(-100vh) rotate(${Math.random() * 30 - 15}deg);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                
+                const style = document.createElement('style');
+                style.innerHTML = keyframes;
+                document.head.appendChild(style);
+                
+                balloon.style.animationName = `float-${i}`;
+                
                 document.body.appendChild(balloon);
             }
         }

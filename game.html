@@ -125,6 +125,8 @@
         height: auto;
         min-width: 320px;
         max-height: 70vh;
+        transform: rotate(360deg);
+        transform-origin: 50% 100%;
       }
       #game:hover {
         filter: drop-shadow(0 0 40px #f9d423cc);
@@ -163,6 +165,42 @@
         html, body {
           padding: 0;
           min-width: 100vw;
+        }
+      }
+      @media (orientation: portrait) {
+        #score {
+          top: 8px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 1rem;
+          padding: 8px 16px;
+          border-radius: 10px;
+          min-width: 90px;
+          width: auto;
+          max-width: 90vw;
+        }
+        #game {
+          margin-top: 10vw;
+          max-width: 98vw;
+          width: 98vw;
+          min-width: 0;
+          height: auto;
+          border-radius: 10px;
+          max-height: 60vh;
+          min-height: 220px;
+          box-sizing: border-box;
+        }
+        span {
+          font-size: 1rem;
+          margin-top: 12px;
+          margin-bottom: 8px;
+          max-width: 95vw;
+        }
+        html, body {
+          min-height: 100vh;
+          min-width: 100vw;
+          padding: 0;
+          overflow-x: hidden;
         }
       }
     </style>
